@@ -1,0 +1,4 @@
+#Ignores all files and directories that start with a dot usefull to don't expose private information to public
+.*
+ensures the .git directory doesn't get ignored which can leed to major issues
+!.git/
