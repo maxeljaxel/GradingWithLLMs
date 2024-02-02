@@ -21,7 +21,7 @@ The .key file has to have the key in the first line, the url in the second line 
 (Niklas sent us these in teams)
 ### 5. Start the application
 ```bash
-cd source
+cd src
 python api_test.py
 ```
 Congratulations you just used the gpt-4 API for the first time (Hooray!)
