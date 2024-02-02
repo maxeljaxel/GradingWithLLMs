@@ -5,12 +5,12 @@ You can find instruction how to do this here: https://www.theserverside.com/blog
 ### 2. Clone the repository
 ### 4 Switch to the dev branch
 ```bash
+cd GradingWithLLMs
 git checkout dev
 ```
 ### 3. Create the python environment
 For Windows instruction see: https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/#creating-a-virtual-environment
 ```bash
- cd GradingWithLLMs
  python3 -m venv .venv
  source .venv/bin/activate
  #You can check if you are in the correct environment by typing: which python
