@@ -1,13 +1,13 @@
-### GradingWithLLMs
+# GradingWithLLMs
 ## Installation
-# 1. (Optional but useful) Add a ssh key to the Repository. 
+### 1. (Optional but useful) Add a ssh key to the Repository. 
 You can find instruction how to do this here: https://www.theserverside.com/blog/Coffee-Talk-Java-News-Stories-and-Opinions/GitHub-SSH-Windows-Example
-# 2. Clone the repository
-# 4 Switch to the dev branch
+### 2. Clone the repository
+### 4 Switch to the dev branch
 ```bash
 git checkout -b dev
 ```
-# 3. Create the python environment
+### 3. Create the python environment
 For Windows instruction see: https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/#creating-a-virtual-environment
 ```bash
  cd GradingWithLLMs
@@ -16,15 +16,15 @@ For Windows instruction see: https://packaging.python.org/en/latest/guides/insta
  #You can check if you are in the correct environment by typing: which python
  pip install -r requirements.txt
 ```
-# 4. Create a .key file in the src/ directory
+### 4. Create a .key file in the src/ directory
 The .key file has to have the key in the first line, the url in the second line and the project name in the third line. You can use  the editor of your choice and just drag and drop it there
 (Niklas sent us these in teams)
-# 5. Start the application
+### 5. Start the application
 ```bash
 cd source
 python api_test.py
 ```
 Congratulations you just used the gpt-4 API for the first time (Hooray!)
 
-# 6. Play around
+### 6. Play around
 Now you can edit the api_test.py file or create your own one. Please use different branch if you do so you can name it like dev/yourNameofChoice
