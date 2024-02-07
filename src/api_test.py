@@ -39,6 +39,7 @@ completion = openai.ChatCompletion.create(
 
 )
 assistant_message = completion['choices'][0]['message']['content']
+print(message_text[0]['content'])
 print(assistant_message)
 # Send a completion call to generate an answer
     #print('Sending a test completion job')
