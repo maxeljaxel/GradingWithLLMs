@@ -19,7 +19,10 @@ def Initialize():
             rowNumber += 1
 
 
-
+#TODO   What if in more than one category?
+#       Only find exact words what about konjugation
+#       Suggestion: cut word and compare if they are a part of a word eg.: instead erklären use erklä
+#       PLEASE ADD QUICK DESCRIPTION OF INPUT AND OUTPUT OF EACH FUCTION
 def IsInBloom(KeyWord):
     Initialize()
     KeyWord = KeyWord.capitalize()
