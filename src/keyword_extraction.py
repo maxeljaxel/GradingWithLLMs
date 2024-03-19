@@ -33,21 +33,3 @@ def IsInBloom(KeyWord):
             return i
     return 'N'
 
-# Takes a string and split it into a list removing all seperators 
-# Returns a List of strings
-def tokenize(text):
-    separators = ['.', ',', ':', ';', '!', '?', ' ', '#']
-    for sep in separators:
-        text = text.replace(sep, '|')
-    return text.split('|')
-
-# Takes a question of type string and returns the Blooms Category of this question as an int 0-6 if the question is not in Bloom it returns 'N'
-def getBloom(question :str):
-    tokenList = tokenize(question)
-    for token in tokenList:
-        if IsInBloom(token) != 'N':#
-            return IsInBloom(token)
-    
-    return 'N'
-
-
