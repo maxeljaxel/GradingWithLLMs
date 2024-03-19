@@ -29,3 +29,17 @@ def IsInBloom(KeyWord):
         if KeyWord in BloomstaxonomieDE[i] or KeyWord in BloomstaxonomieEN[i]:
             return i
     return 'N'
+
+# Takes a string and split it into a list removing all seperators 
+# Returns a List of strings
+def tokenize(text):
+    separators = ['.', ',', ':', ';', '!', '?', ' ', '#']
+    for sep in separators:
+        text = text.replace(sep, '|')
+    return text.split('|')
+
+# Takes a question of type string and returns the Blooms Category of this question
+def getBloom(question :str):
+    tokenList = tokenize(question)
+    for token in tokenList:
+
