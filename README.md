@@ -24,3 +24,7 @@ Congratulations you just used the gpt-4 API for the first time (Hooray!)
 
 ### 6. Play around
 Now you can edit the api_test.py file or create your own one. Please use different branch if you do so you can name it like dev/yourNameofChoice
+
+# Data
+
+![Proposal how our data should look](Data_Diagram.drawio.png)
