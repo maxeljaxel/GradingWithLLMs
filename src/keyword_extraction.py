@@ -5,6 +5,20 @@ BloomstaxonomieEN = [[], [], [], [], [], []]
 
 
 def Initialize():
+    """This function will take the data from the file bloom_keywords_en_de.csv and 
+        fill both arrays - BloomstaxonomieDE und BloomstaxonomieEN with the corresponding data.
+        Both arrays consist of 6 subarrays, each one is reserved for exactly one category
+        in the bloostaxonomie
+
+        Parameters
+        ----------
+        no Parameters
+
+        Output
+        --------
+        filled arrays BloomstaxonomieDE and BloomstaxonomieEN
+
+        """
     with open('bloom_keywords_en_de.csv', 'r', encoding='utf-8') as csv_datei:
         csv_reader = csv.reader(csv_datei, delimiter=';')
         next(csv_reader)
@@ -23,13 +37,34 @@ def Initialize():
 #       Only find exact words what about konjugation
 #       Suggestion: cut word and compare if they are a part of a word eg.: instead erklären use erklä
 #       PLEASE ADD QUICK DESCRIPTION OF INPUT AND OUTPUT OF EACH FUCTION
-def IsInBloom(KeyWord):
+
+def isInBloom(keyWord):
+    """Will compare a string keyWord to each word from the bloomstaxonomie,
+        and if the Keyword matches a word from the tax., will return the corresponding
+        category
+
+        Parameters
+        ----------
+        keyWord : str, required
+            The string that will be checked.
+
+        Output
+        ------
+        a number between 0 and 5, if KeyWord is in the tax. category 0-5
+        N -> if KeyWord is not in a tax. category
+        """
+
+    #initialize bloomstaxonomie in the english and german version
     Initialize()
-    KeyWord = KeyWord.capitalize()
-    print(KeyWord)
+    #since the csv contains words with the first letter capitalized -> do the same for the keyWord
+    keyWord = keyWord.capitalize()
+    #checke if the word is in the english or german version of the taxonomie
     for i in range(0, 6):
-        print(BloomstaxonomieEN[i])
-        if KeyWord in BloomstaxonomieDE[i] or KeyWord in BloomstaxonomieEN[i]:
+        if keyWord in BloomstaxonomieDE[i] or keyWord in BloomstaxonomieEN[i]:
             return i
+    #if not -> return N
     return 'N'
+
+
+print(isInBloom("Verwenden"))
 
