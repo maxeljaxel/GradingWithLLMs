@@ -34,9 +34,6 @@ def Initialize():
 
 
 #TODO   What if in more than one category?
-#       Only find exact words what about konjugation
-#       Suggestion: cut word and compare if they are a part of a word eg.: instead erklären use erklä
-#       PLEASE ADD QUICK DESCRIPTION OF INPUT AND OUTPUT OF EACH FUCTION
 
 def isInBloom(keyWord):
     """Will compare a string keyWord to each word from the bloomstaxonomie,
@@ -60,11 +57,16 @@ def isInBloom(keyWord):
     keyWord = keyWord.capitalize()
     #checke if the word is in the english or german version of the taxonomie
     for i in range(0, 6):
-        if keyWord in BloomstaxonomieDE[i] or keyWord in BloomstaxonomieEN[i]:
-            return i
+        for word in BloomstaxonomieDE[i] + BloomstaxonomieEN[i]:
+            if word[:len(keyWord)] == keyWord:
+                return i
+    #if keyword is abbreviation, check if the abbreviation is in the taxonomie
+            if keyWord[len(keyWord)-1] == '.':
+                if word[:len(keyWord)-1] == keyWord[:len(keyWord)-1]:
+                    return i
     #if not -> return N
     return 'N'
 
 
-print(isInBloom("Verwenden"))
+
 
