@@ -58,7 +58,7 @@ def isInBloom(keyWord):
     #checke if the word is in the english or german version of the taxonomie
     for i in range(0, 6):
         for word in BloomstaxonomieDE[i] + BloomstaxonomieEN[i]:
-            if word[:len(keyWord)] == keyWord:
+            if word in keyword:
                 return i
     #if keyword is abbreviation, check if the abbreviation is in the taxonomie
             if keyWord[len(keyWord)-1] == '.':
