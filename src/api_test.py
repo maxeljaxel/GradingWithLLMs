@@ -51,7 +51,7 @@ print(assistant_message)
 
 data_set = cd.create_tuple_dict(cd.read_json_file("intents.json"))
 for questions in data_set:
-    message_text = [{"role":"system","content":f"Question: {questions[0]} Answer: {questions[1]} Blooms Kategory: {questions[2]}"}] 
+    message_text = [{"role":"system","content":f"Question: {data_set[questions][0]} Answer: {data_set[questions][1]} Blooms Kategory: {data_set[questions][2]}"}]
     completion = openai.ChatCompletion.create(
 
          engine="GPT4StudentAssessment",
