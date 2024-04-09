@@ -1,5 +1,6 @@
 import os
 import openai
+import create_dataset as cd
 
 with open('.key', 'r') as file:
     # Read a line from the file
@@ -16,7 +17,7 @@ openai.api_version = '2023-05-15' # this might chage in the future
 deployment_name= name
 
 
-message_text = [{"role":"system","content":"Tell me a joke about a horse in a pub"}]
+message_text = [{"role":"system","content":"You will recieve now question, answers and the bloom taxonomy category of the questions. Please evaluate how the answers are"}]
 
 
 completion = openai.ChatCompletion.create(
@@ -47,3 +48,30 @@ print(assistant_message)
     #response = openai.ChatCompletion.create(engine=deployment_name, prompt=start_phrase, max_tokens=10)
     #text = response['choices'][0]['text'].replace('\n', '').replace(' .', '.').strip()
     #print(start_phrase+text)
+
+data_set = cd.create_tuple_dict(cd.read_json_file("intents.json"))
+for questions in data_set:
+    message_text = [{"role":"system","content":f"Question: {questions[0]} Answer: {questions[1]} Blooms Kategory: {questions[2]}"}] 
+    completion = openai.ChatCompletion.create(
+
+         engine="GPT4StudentAssessment",
+
+         messages = message_text,
+
+         temperature=0.7,
+
+         max_tokens=800,
+
+         top_p=0.95,
+
+         frequency_penalty=0,
+
+         presence_penalty=0,
+
+         stop=None
+    )
+    assistant_message = completion['choices'][0]['message']['content']
+    with open("first_data_set_run.txt", "a") as file:
+        file.write(assistant_message)
+        file.write("\n")
+print("task complete")
