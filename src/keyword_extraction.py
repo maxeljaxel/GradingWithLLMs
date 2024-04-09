@@ -35,14 +35,14 @@ def Initialize():
 
 #TODO   What if in more than one category?
 
-def isInBloom(keyWord):
-    """Will compare a string keyWord to each word from the bloomstaxonomie,
+def isInBloom(question):
+    """Will compare a string question to each word from the bloomstaxonomie,
         and if the Keyword matches a word from the tax., will return the corresponding
         category
 
         Parameters
         ----------
-        keyWord : str, required
+        question : str, required
             The string that will be checked.
 
         Output
@@ -53,16 +53,16 @@ def isInBloom(keyWord):
 
     #initialize bloomstaxonomie in the english and german version
     Initialize()
-    #since the csv contains words with the first letter capitalized -> do the same for the keyWord
-    keyWord = keyWord.capitalize()
+    #since the csv contains words with the first letter capitalized -> do the same for the question
+    question = question.capitalize()
     #checke if the word is in the english or german version of the taxonomie
     for i in range(0, 6):
         for word in BloomstaxonomieDE[i] + BloomstaxonomieEN[i]:
-            if word in keyword:
+            if word in question:
                 return i
     #if keyword is abbreviation, check if the abbreviation is in the taxonomie
-            if keyWord[len(keyWord)-1] == '.':
-                if word[:len(keyWord)-1] == keyWord[:len(keyWord)-1]:
+            if question[len(question)-1] == '.':
+                if word[:len(question)-1] == question[:len(question)-1]:
                     return i
     #if not -> return N
     return 'N'
