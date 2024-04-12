@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <title>Titel</title>
+</head>
+<body>
+    <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <div class="container">
+    <h1 style="margin-top:20px;">Grading with LLMs</h1>
+
+    <form onsubmit="sendData(event)">
+        <label for="question">Please write here the question that you want to get checked:</label> <br> <br>
+        <textarea class="form-control w-50 mb-4" id="question" name="question" rows="2" style="resize: none">
+    </textarea> <br>
+        <label for="sampleSolution">Please write here the perfect answer</label> <br> <br>
+        <textarea class="form-control w-50 mb-4" id="sampleSolution" name="sampleSolution" rows="3" style="resize: none">
+    </textarea>
+
+        <br>
+
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="" id="check">
+            <label class="form-check-label" for="check">
+                Do you want to add important keywords?
+            </label>
+        </div><br>
+        <input type="text" id="keywords" class="form-control" style="display: none;" placeholder="keyword1;keyword2"><br>
+        <button class="btn btn-primary" type="submit">submit</button>
+    </form>
+
+</div>
+    <script>
+        $(document).ready(function() {
+            $('#check').change(function() {
+                if(this.checked) {
+                    $('#keywords').show();
+                } else {
+                    $('#keywords').hide();
+                }
+            });
+        });
+    </script>
+<script>
+    var xhr = null;
+
+    getXmlHttpRequestObject = function () {
+        if (!xhr) {
+            // Create a new XMLHttpRequest object
+            xhr = new XMLHttpRequest();
+        }
+        return xhr;
+    };
+
+    function sendDataCallback() {
+        // Check response is ready or not
+        if (xhr.readyState == 4 && xhr.status == 201) {
+            console.log("Data creation response received!");
+            dataDiv = document.getElementById('sent-data-container');
+            // Send response Text
+            console.log(xhr.responseText);
+        }
+    }
+    function getFormData() {
+
+        var question = document.getElementById('question').value;
+        var sampleSolution = document.getElementById('sampleSolution').value;
+        var check = document.getElementById('check').checked; // For checkbox, use 'checked' instead of 'value'
+        var keywords = document.getElementById('keywords').value;
+
+        return dataToSend = {
+            question: question,
+            sampleSolution: sampleSolution,
+            check: check,
+            keywords: keywords
+        };
+    }
+    function sendData(event) {
+        event.preventDefault(); //TODO remove for real tests
+        dataToSend = getFormData();
+        console.log(dataToSend);
+        if (!dataToSend) {
+            console.log("Data is empty.");
+            return;
+        }
+        console.log("Sending data: " + dataToSend);
+        xhr = getXmlHttpRequestObject();
+        xhr.onreadystatechange = sendDataCallback;
+        // asynchronous requests
+        xhr.open("POST", "http://localhost:6969/users", true);
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        // Send the request over the network
+        xhr.send(JSON.stringify({"data": dataToSend}));
+    }
+
+</script>
+</body>
+</html>

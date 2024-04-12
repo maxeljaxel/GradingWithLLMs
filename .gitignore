@@ -2,3 +2,5 @@
 .*
 ensures the .git directory doesn't get ignored which can leed to major issues
 !.git/
+server/venv
+venv    	
