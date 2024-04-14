@@ -19,44 +19,59 @@ def compare_to_database(database, gpt_output, points=False):
         for row in reader:
             # Extract relevant values from the CSV row
             question = row['question']
-            gpt_answer = row['gpt_output']
+            gpt_evaluation = row['gpt_output']
 
             # Check if question exists in the database
-            if question in database:
+            found_key = None
+            for key, values in database.items():
+                if question in values:
+                    found_key = key
+                    break
+
+            if found_key is not None:
                 # Compare GPT answer with expected answer from the database
-                expected_answer = database[question]
+                expected_evaluation = database[found_key][3]
                 if points:
                     # Compute squared error if points=True
                     # Maximum squared error is 50 -- subject to change
-                    difference = abs(float(gpt_answer) - float(expected_answer))
+                    difference = abs(float(gpt_evaluation) - float(expected_evaluation))
                     squared_error = min((difference ** 2), 50)
                     squared_error_sum += squared_error
                     if squared_error == 0:
-                        correctness[question] = 'Correct'
+                        correctness[question] = "Correct"
                     else:
-                        correctness[question] = 'False -- evaluation off by: ' + str(difference) + ' points'
+                        correctness[question] = "False -- evaluation off by: " + str(difference) + " points"
                 else:
                     # Count correct answers if points=False
-                    if gpt_answer == expected_answer:
+                    if gpt_evaluation.strip() == expected_evaluation.strip():
                         correct_count += 1
-                        correctness[question] = 'Correct'
+                        correctness[question] = "Correct"
                     else:
-                        correctness[question] = 'False'
+                        correctness[question] = "False"
                 total_questions += 1
 
     # Calculate percentage of correct answers
-    if points:
-        correctness_percentage = 1 - (squared_error_sum / (total_questions * 50)) # Max error = 50
+    if total_questions > 0:
+        if points:
+            correctness_percentage = 1 - (squared_error_sum / (total_questions * 50))  # Max error = 50
+        else:
+            correctness_percentage = correct_count / total_questions
     else:
-        correctness_percentage = correct_count / total_questions
+        correctness_percentage = 0
 
     return correctness_percentage, correctness
 
 
 # TEST:
 # Read database from JSON and convert it to a hashmap
-database_json = cds.read_json_file('database.json')
-database_dict = cds.create_tuple_dict(database_json)
+#database_json = cds.read_json_file('intents.json')
+#database_dict = cds.create_tuple_dict(database_json)
+
+# Example dictionary
+database_dict = {
+    0: ['Explain data abstraction.', 'Answer', 'Taxonomy', 'Correct'],
+    1: ['What is software testing?', 'Answer', 'Taxonomy', 'Correct']
+}
 
 # Specify the path to the GPT output CSV file
 gpt_output = 'gpt_output.csv'
@@ -67,6 +82,6 @@ print("Percentage of Correct Answers:", result_percentage_correct)
 print("Correctness Results:", correctness_result)
 
 # Test with points=True for squared error term calculation
-result_squared_error, correctness_result = compare_to_database(database_dict, gpt_output, points=True)
-print("Squared Error Term:", result_squared_error)
-print("Correctness Results:", correctness_result)
+#result_squared_error, correctness_result = compare_to_database(database_dict, gpt_output, points=True)
+#print("Squared Error Term:", result_squared_error)
+#print("Correctness Results:", correctness_result)
