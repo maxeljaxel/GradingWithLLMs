@@ -81,16 +81,14 @@ def final_prompt_generator(self):
     prompt_appendix_steps += f"""\n{step_counter}. Evaluate if the answer of the student is right or wrong and if there 
 are missing or false information please highlight them and explain, why these information are false. Don't outline the
 correct information."""
-    prompt_appendix_steps += """\nThe Output should be in a JSON format.
+    prompt_appendix_steps += """\nThe Output should always be in a JSON format. But never write json in front of it.
 Example:
 {
-    "solution":
-    "evaluation":{
-        "correctness":
-        "explanation":
-        "missing_information":
-        "false_information":
-    }       
+    "solution":"",
+    "correctness":"",
+    "explanation":"",
+    "missing_information":"",
+    "false_information":"",
 }"""
 
     prompt = f"""You are an AI assistant that helps with the assessment of free text answers in the subject software 

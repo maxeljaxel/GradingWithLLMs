@@ -1,4 +1,5 @@
 import openai
+import json
 
 with open('.key', 'r') as file:
     # Read a line from the file
@@ -54,3 +55,17 @@ def send_message_and_temp(message, temp):
         stop=None
     )
     return response['choices'][0]['message']['content']
+
+
+# Converts the response into a JSON-object, if it is not possible to convert it prints the output out with a warning
+def convert_response_into_json(response):
+    json_object = None
+    try:
+        if response.startswith("```"):
+            response = response.lstrip("```json")
+            response = response.rstrip("```")
+        json_object = json.loads(response)
+    except Exception as e:
+        print("The response is not valid JSON", e)
+    finally:
+        return json_object
