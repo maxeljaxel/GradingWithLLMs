@@ -1,10 +1,7 @@
 {
-    "intents": [
-    {
-        "solutions": "Software testing is a critical phase in the software development lifecycle that involves the analysis of software to confirm that it meets the required standards and to detect any defects. It serves multiple purposes: verifying that the software functions as intended, ensuring that it meets the specified requirements, and identifying any problems or bugs that need to be addressed. Testing can be conducted at different levels, such as unit testing, integration testing, system testing, and acceptance testing. It can be performed manually or with the help of automated tools. The ultimate goal of software testing is to ensure the reliability, security, and high performance of the software product.",
-        "correctness": "4",
-        "explanations": "",
-        "missing_information": "The student's answer could be enhanced by mentioning the goals of ensuring reliability, security, and performance of the software product, which are also important aspects of software testing.",
-        "false_information": ""
-    }]
+    "solution": "Software testing is a critical phase in the software development lifecycle that involves the analysis of software to confirm that it meets the required standards and to detect any defects. It serves multiple purposes: verifying that the software functions as intended, ensuring that it meets the specified requirements, and identifying any problems or bugs that need to be addressed. Testing can be conducted at different levels, such as unit testing, integration testing, system testing, and acceptance testing. It can be performed manually or with the help of automated tools. The ultimate goal of software testing is to ensure the reliability, security, and high performance of the software product.",
+    "correctness": "4",
+    "explanation": "",
+    "missing_information": "The student's answer could be enhanced by mentioning the goals of ensuring reliability, security, and performance of the software product, which are also important aspects of software testing.",
+    "false_information": ""
 }

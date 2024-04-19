@@ -2,26 +2,19 @@ import json
 import csv
 import create_dataset as cds
 
-# This method creates a hashmap from a JSON file, which is the output
-# of GPT
-def create_gpt_dataset(data):
-    dict = {}
+# This method parses a GPT response, which can then be stored in a dictionary for comparison
+def parse_gpt_response(response):
+    # Parse JSON response into a Python dictionary
+    response_dict = json.loads(response)
 
-    if data:
-        intents = data['intents']
-        for i, intent in enumerate(intents):
-            solutions = intent['solutions']
-            correctness = intent['correctness']
-            explanations = intent['explanations']
-            missing_information = intent['missing_information']
-            false_information = intent['false_information']
+    # Extract required fields from the dictionary
+    solution = response_dict['solution']
+    correctness = response_dict['correctness']
+    explanation = response_dict['explanation']
+    missing_information = response_dict['missing_information']
+    false_information = response_dict['false_information']
 
-           # Tupel mit den zusätzlichen Informationen erstellen
-            tuple_data = (solutions, correctness, explanations, missing_information, false_information)
-            # Tupel dem Dictionary hinzufügen
-            dict[i] = tuple_data
-    return dict
-
+    return [solution, correctness, explanation, missing_information, false_information]
 
 # This method computes the correctness of evaluations by GPT.
 # It compares the expected "correctness" value from the database with
@@ -74,8 +67,19 @@ def compare_to_database(database, gpt_output, points=False):
     return correctness_percentage, correctness
 
 
-
+'''
 # TEST:
+
+jsonString = """{
+    "solution": "Software testing is a critical phase in the software development lifecycle that involves the analysis of software to confirm that it meets the required standards and to detect any defects. It serves multiple purposes: verifying that the software functions as intended, ensuring that it meets the specified requirements, and identifying any problems or bugs that need to be addressed. Testing can be conducted at different levels, such as unit testing, integration testing, system testing, and acceptance testing. It can be performed manually or with the help of automated tools. The ultimate goal of software testing is to ensure the reliability, security, and high performance of the software product.",
+    "correctness": "4",
+    "explanation": "",
+    "missing_information": "The student's answer could be enhanced by mentioning the goals of ensuring reliability, security, and performance of the software product, which are also important aspects of software testing.",
+    "false_information": ""
+}"""
+
+print(parse_gpt_response(jsonString))
+
 # Read database from JSON and convert it to a hashmap
 database_json = cds.read_json_file('intents.json')
 database_dict = cds.create_tuple_dict(database_json)
@@ -87,7 +91,6 @@ result_squared_error, correctness_result = compare_to_database(database_dict, gp
 print("Correctness:", result_squared_error)
 print("Correctness Results:", correctness_result)
 
-'''
 # Test with points=False for percentage of correct answers
 result_percentage_correct, correctness_result = compare_to_database(database_dict, gpt_output, points=False)
 print("Percentage of Correct Answers:", result_percentage_correct * 100, "%")
