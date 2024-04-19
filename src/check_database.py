@@ -1,5 +1,41 @@
+import json
 import csv
 import create_dataset as cds
+
+# This method creates a hashmap from a JSON file, which is the output
+# of GPT
+def read_json_and_store(json_file):
+    # Initialize an empty dictionary to store the data
+    data_dict = {}
+
+    # Read data from the JSON file
+    with open(json_file, 'r') as file:
+        json_data = json.load(file)
+
+        # Check if the 'solution' key exists in the JSON data
+        if 'solution' in json_data:
+            solution = json_data['solution']
+
+            # Check if the 'evaluation' key exists in the 'solution' dictionary
+            if 'evaluation' in solution:
+                evaluation = solution['evaluation']
+
+                # Check if the required keys exist in the 'evaluation' dictionary
+                if all(key in evaluation for key in ['correctness', 'explanation', 'missing_information', 'false_information']):
+                    # Store the data in the dictionary
+                    data_dict['correctness'] = evaluation['correctness']
+                    data_dict['explanation'] = evaluation['explanation']
+                    data_dict['missing_information'] = evaluation['missing_information']
+                    data_dict['false_information'] = evaluation['false_information']
+                else:
+                    print("Error: Required categories missing in the evaluation.")
+            else:
+                print("Error: Evaluation not found in the 'solution' dictionary.")
+        else:
+            print("Error: Solution not found in the JSON data.")
+
+    return data_dict
+
 
 # This method computes the correctness of evaluations by GPT.
 # It compares the expected "correctness" value from the database with
@@ -70,7 +106,9 @@ def compare_to_database(database, gpt_output, points=False):
 # Example dictionary
 database_dict = {
     0: ['Explain data abstraction.', 'Answer', 'Taxonomy', 'Correct'],
-    1: ['What is software testing?', 'Answer', 'Taxonomy', 'Correct']
+    1: ['What is software testing?', 'Answer', 'Taxonomy', 'Correct'],
+    2: ['Frage2', 'Answer', 'Taxonomy', 'False'],
+    3: ['Frage3', 'Answer', 'Taxonomy', 'Correct']
 }
 
 # Specify the path to the GPT output CSV file
@@ -78,8 +116,8 @@ gpt_output = 'gpt_output.csv'
 
 # Test with points=False for percentage of correct answers
 result_percentage_correct, correctness_result = compare_to_database(database_dict, gpt_output, points=False)
-print("Percentage of Correct Answers:", result_percentage_correct)
-print("Correctness Results:", correctness_result)
+print("Percentage of Correct Answers:", result_percentage_correct * 100, "%")
+print("Correctness Results: ", correctness_result)
 
 # Test with points=True for squared error term calculation
 #result_squared_error, correctness_result = compare_to_database(database_dict, gpt_output, points=True)
