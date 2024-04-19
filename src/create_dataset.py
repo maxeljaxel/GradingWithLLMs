@@ -26,7 +26,7 @@ def create_tuple_dict(data):
             responses = intent['responses']
             for pattern, response in zip(patterns, responses):
                 # Tupel mit den zusätzlichen Informationen erstellen
-                tuple_data = (pattern, response, ke.IsInBloom(pattern))
+                tuple_data = (pattern, response, ke.isInBloom(pattern))
                 # Tupel dem Dictionary hinzufügen
                 tuple_dict[i] = tuple_data
     return tuple_dict
