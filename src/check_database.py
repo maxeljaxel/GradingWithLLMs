@@ -4,37 +4,23 @@ import create_dataset as cds
 
 # This method creates a hashmap from a JSON file, which is the output
 # of GPT
-def read_json_and_store(json_file):
-    # Initialize an empty dictionary to store the data
-    data_dict = {}
+def create_gpt_dataset(data):
+    dict = {}
 
-    # Read data from the JSON file
-    with open(json_file, 'r') as file:
-        json_data = json.load(file)
+    if data:
+        intents = data['intents']
+        for i, intent in enumerate(intents):
+            solutions = intent['solutions']
+            correctness = intent['correctness']
+            explanations = intent['explanations']
+            missing_information = intent['missing_information']
+            false_information = intent['false_information']
 
-        # Check if the 'solution' key exists in the JSON data
-        if 'solution' in json_data:
-            solution = json_data['solution']
-
-            # Check if the 'evaluation' key exists in the 'solution' dictionary
-            if 'evaluation' in solution:
-                evaluation = solution['evaluation']
-
-                # Check if the required keys exist in the 'evaluation' dictionary
-                if all(key in evaluation for key in ['correctness', 'explanation', 'missing_information', 'false_information']):
-                    # Store the data in the dictionary
-                    data_dict['correctness'] = evaluation['correctness']
-                    data_dict['explanation'] = evaluation['explanation']
-                    data_dict['missing_information'] = evaluation['missing_information']
-                    data_dict['false_information'] = evaluation['false_information']
-                else:
-                    print("Error: Required categories missing in the evaluation.")
-            else:
-                print("Error: Evaluation not found in the 'solution' dictionary.")
-        else:
-            print("Error: Solution not found in the JSON data.")
-
-    return data_dict
+           # Tupel mit den zusätzlichen Informationen erstellen
+            tuple_data = (solutions, correctness, explanations, missing_information, false_information)
+            # Tupel dem Dictionary hinzufügen
+            dict[i] = tuple_data
+    return dict
 
 
 # This method computes the correctness of evaluations by GPT.
@@ -49,42 +35,32 @@ def compare_to_database(database, gpt_output, points=False):
     # Hashmap for easy look-up (containing Strings)
     correctness = {}
 
-    # Read data from GPT output
-    with open(gpt_output, 'r', newline='', encoding='utf-8') as gpt_o:
-        reader = csv.DictReader(gpt_o)
-        for row in reader:
-            # Extract relevant values from the CSV row
-            question = row['question']
-            gpt_evaluation = row['gpt_output']
+    # Iterate over each question in the GPT output
+    for index, data in database.items():
+        # Compare GPT evaluation with expected evaluation
+        if points:
+            expected_evaluation = int(data[4][0])  # Extract expected evaluation from database
+            gpt_evaluation = int(gpt_output[index][1])  # Get GPT evaluation for the question
 
-            # Check if question exists in the database
-            found_key = None
-            for key, values in database.items():
-                if question in values:
-                    found_key = key
-                    break
+            # Compute squared error if points=True
+            difference = abs(float(gpt_evaluation) - float(expected_evaluation))
+            squared_error = min((difference ** 2), 50)  # Maximum squared error is 50
+            squared_error_sum += squared_error
+            if squared_error == 0:
+                correctness[index] = "Correct"
+            else:
+                correctness[index] = f"False -- evaluation off by: {difference} points"
+        else:
+            expected_evaluation = data[4][0].capitalize()  # Extract expected evaluation from database
+            gpt_evaluation = gpt_output[index][1].capitalize()  # Get GPT evaluation for the question
 
-            if found_key is not None:
-                # Compare GPT answer with expected answer from the database
-                expected_evaluation = database[found_key][3]
-                if points:
-                    # Compute squared error if points=True
-                    # Maximum squared error is 50 -- subject to change
-                    difference = abs(float(gpt_evaluation) - float(expected_evaluation))
-                    squared_error = min((difference ** 2), 50)
-                    squared_error_sum += squared_error
-                    if squared_error == 0:
-                        correctness[question] = "Correct"
-                    else:
-                        correctness[question] = "False -- evaluation off by: " + str(difference) + " points"
-                else:
-                    # Count correct answers if points=False
-                    if gpt_evaluation.strip() == expected_evaluation.strip():
-                        correct_count += 1
-                        correctness[question] = "Correct"
-                    else:
-                        correctness[question] = "False"
-                total_questions += 1
+            # Count correct answers if points=False
+            if gpt_evaluation.strip() == expected_evaluation.strip():
+                correct_count += 1
+                correctness[index] = "Correct"
+            else:
+                correctness[index] = "False"
+        total_questions += 1
 
     # Calculate percentage of correct answers
     if total_questions > 0:
@@ -98,22 +74,20 @@ def compare_to_database(database, gpt_output, points=False):
     return correctness_percentage, correctness
 
 
+
 # TEST:
 # Read database from JSON and convert it to a hashmap
-#database_json = cds.read_json_file('intents.json')
-#database_dict = cds.create_tuple_dict(database_json)
+database_json = cds.read_json_file('intents.json')
+database_dict = cds.create_tuple_dict(database_json)
 
-# Example dictionary
-database_dict = {
-    0: ['Explain data abstraction.', 'Answer', 'Taxonomy', 'Correct'],
-    1: ['What is software testing?', 'Answer', 'Taxonomy', 'Correct'],
-    2: ['Frage2', 'Answer', 'Taxonomy', 'False'],
-    3: ['Frage3', 'Answer', 'Taxonomy', 'Correct']
-}
+gpt_json = cds.read_json_file('output.json')
+gpt_dict = create_gpt_dataset(gpt_json)
 
-# Specify the path to the GPT output CSV file
-gpt_output = 'gpt_output.csv'
+result_squared_error, correctness_result = compare_to_database(database_dict, gpt_dict, points=True)
+print("Correctness:", result_squared_error)
+print("Correctness Results:", correctness_result)
 
+'''
 # Test with points=False for percentage of correct answers
 result_percentage_correct, correctness_result = compare_to_database(database_dict, gpt_output, points=False)
 print("Percentage of Correct Answers:", result_percentage_correct * 100, "%")
@@ -123,3 +97,4 @@ print("Correctness Results: ", correctness_result)
 #result_squared_error, correctness_result = compare_to_database(database_dict, gpt_output, points=True)
 #print("Squared Error Term:", result_squared_error)
 #print("Correctness Results:", correctness_result)
+'''
