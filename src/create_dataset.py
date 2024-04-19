@@ -24,9 +24,10 @@ def create_tuple_dict(data):
             tag = intent['tag']
             patterns = intent['patterns']
             responses = intent['responses']
+            expected_eval = intent['expected_evaluations']
             for pattern, response in zip(patterns, responses):
                 # Tupel mit den zusätzlichen Informationen erstellen
-                tuple_data = (pattern, response, ke.isInBloom(pattern))
+                tuple_data = (tag, pattern, response, ke.isInBloom(pattern), expected_eval)
                 # Tupel dem Dictionary hinzufügen
                 tuple_dict[i] = tuple_data
     return tuple_dict
