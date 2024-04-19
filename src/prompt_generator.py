@@ -81,6 +81,17 @@ def final_prompt_generator(self):
     prompt_appendix_steps += f"""\n{step_counter}. Evaluate if the answer of the student is right or wrong and if there 
 are missing or false information please highlight them and explain, why these information are false. Don't outline the
 correct information."""
+    prompt_appendix_steps += """\nThe Output should be in a JSON format.
+Example:
+{
+    "solution":
+    "evaluation":{
+        "correctness":
+        "explanation":
+        "missing_information":
+        "false_information":
+    }       
+}"""
 
     prompt = f"""You are an AI assistant that helps with the assessment of free text answers in the subject software 
 engineering and programming. You will receive the question and the student answer to this question.\n{self.bloom_prompt}

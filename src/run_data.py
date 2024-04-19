@@ -15,7 +15,10 @@ for question in data_set:
         },
         {"role": "user",
          "content": f""" Answer: {data_set[question][1]} """}]
-    result = access_point.send_message(message_text)
+    result = ""
+    while not result:
+        result = access_point.send_message(message_text)
+
     with open("output.txt", "a") as file:
         file.write(f"Question nr: {question + 1}\nQuestion: {data_set[question][0]}\nAnswer: {data_set[question][1]}\n")
         file.write(result)
