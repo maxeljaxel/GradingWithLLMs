@@ -1,5 +1,6 @@
-from flask import Flask, request
+from flask import Flask, jsonify, request
 from flask_cors import CORS
+from werkzeug.utils import secure_filename
 import flask
 import json
 
@@ -33,5 +34,21 @@ def users():
         }
         return flask.Response(response=json.dumps(return_data), status=201)
     
+@app.route('/file', methods=["GET", "POST"])
+def fileUpload():
+    print("fileUpload reached")
+    if request.method == "POST":
+        file = request.files['file']
+        filename = secure_filename(file.filename)
+        file.save(filename)
+        print(filename)
+        with open(filename, 'r') as f:
+            first_line = f.readline()
+            print('First line of the file:', first_line)
+
+        return jsonify({"status": "file uploaded"}), 200
+    else: 
+        return jsonify({"status": "GET request received"}), 200
+
 if __name__ == "__main__":
     app.run("localhost", 6969)
