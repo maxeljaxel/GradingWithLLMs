@@ -44,8 +44,8 @@ def compare_to_database(database, gpt_output, points=False):
             else:
                 correctness[index] = f"False -- evaluation off by: {difference} points"
         else:
-            expected_evaluation = data[4][0].capitalize()  # Extract expected evaluation from database
-            gpt_evaluation = gpt_output[index][1].capitalize()  # Get GPT evaluation for the question
+            expected_evaluation = data[4][0].lower()  # Extract expected evaluation from database
+            gpt_evaluation = gpt_output[index][1].lower()  # Get GPT evaluation for the question
 
             # Count correct answers if points=False
             if gpt_evaluation.strip() == expected_evaluation.strip():
