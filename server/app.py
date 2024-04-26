@@ -14,16 +14,6 @@ def hello():
 @app.route('/users', methods=["GET", "POST"])
 def users():
     print("users endpoint reached")
-    if request.method == "GET":
-        with open("users.json", "r") as f:
-            data = json.load(f)
-            data.append({
-                "username":"user4",
-                "pets": ["hamster"]
-            })
-            return flask.jsonify(data)
-        
-        
     if request.method == "POST":
         received_data = request.get_json()
         print(f"received data: {received_data}")
