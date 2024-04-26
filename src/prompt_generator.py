@@ -78,7 +78,7 @@ def final_prompt_generator(self):
         step_counter += 1
         prompt_appendix_steps += f"\n{step_counter}. Compare your solution with the answer of the student"
     step_counter += 1
-    prompt_appendix_steps += f"""\n{step_counter}. Evaluate if the answer of the student is right or wrong and if there 
+    prompt_appendix_steps += f"""\n{step_counter}. Evaluate the answer of the student by giving a score from 0 to 5 and if there 
 are missing or false information please highlight them and explain, why these information are false. Don't outline the
 correct information."""
     prompt_appendix_steps += """\nThe Output should always be in a JSON format. But never write json in front of it.
