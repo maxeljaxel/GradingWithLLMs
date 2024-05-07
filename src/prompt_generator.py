@@ -60,6 +60,21 @@ corresponding to the possible achievable points for the question."""
     return prompt
 
 
+# This method creates a substring of the prompt for the GPT-4 API. If the user supplies a maximum point range, then this
+# will be considered in the prompt, otherwise the prompt will only command to correct if the answer given is right,
+# partially right or wrong.
+def evaluation_method_prompt_generator(self, points):
+    if type(points) is int or type(points) is float:
+        prompt = f"""Evaluate the answer of the student by giving a score from 0 to {points} and if there 
+are missing or false information please highlight them and explain, why these information are false. Don't outline the
+correct information."""
+    else:
+        prompt = """Evaluate the answer of the student if it is right, partially right or wrong and if there 
+are missing or false information please highlight them and explain, why these information are false. Don't outline the
+correct information."""
+    return prompt
+
+
 # This method generates the final prompt. It uses the specific information of the whole task and generates a prompt
 # based on the information
 def final_prompt_generator(self):
@@ -78,9 +93,7 @@ def final_prompt_generator(self):
         step_counter += 1
         prompt_appendix_steps += f"\n{step_counter}. Compare your solution with the answer of the student"
     step_counter += 1
-    prompt_appendix_steps += f"""\n{step_counter}. Evaluate the answer of the student by giving a score from 0 to 5 and if there 
-are missing or false information please highlight them and explain, why these information are false. Don't outline the
-correct information."""
+    prompt_appendix_steps += f"\n{step_counter}. {self.evaluation_prompt}"
     prompt_appendix_steps += """\nThe Output should always be in a JSON format. But never write json in front of it.
 Example:
 {
@@ -93,7 +106,7 @@ Example:
 
     prompt = f"""You are an AI assistant that helps with the assessment of free text answers in the subject software 
 engineering and programming. You will receive the question and the student answer to this question.\n{self.bloom_prompt}
-\nThe examination question is: \n{self.question[0]}{self.keyword_prompt}{self.example_solution_prompt}
+\nThe examination question is: \n{self.question}{self.keyword_prompt}{self.example_solution_prompt}
     \nWith all this information to will now evaluate the incoming student answer.
     \nDo the following steps:
     """
@@ -103,24 +116,27 @@ engineering and programming. You will receive the question and the student answe
 # Basic prompt generator class. Purpose is to dynamically modify the content for the role system/assistant according to
 # the question and several settings, that are included.
 class PromptGenerator:
-    question = {}
     keyword_present = False
     solution_present = False
 
     def __init__(self):
+        self.question = ""
         self.bloom_prompt = ""
         self.keyword_prompt = ""
+        self.evaluation_prompt = ""
         self.example_solution_prompt = ""
         self.final_prompt = ""
 
     # End-point for the prompt generation. Needs the question tuple, the keyword list and the exampl solution. None of
     # the last two attributes need a value for this method to work perfectly.
-    def generate_prompts(self, question, keywords, example_solution):
+    def generate_prompts(self, question, points, bloom_level, keywords, example_solution):
         self.keyword_present = len(keywords) > 0
         self.solution_present = example_solution is not None
         self.question = question
-        self.bloom_prompt = bloom_prompt_generator(self, question[2])
+
+        self.bloom_prompt = bloom_prompt_generator(self, bloom_level)
         self.keyword_prompt = keyword_prompt_generator(self, keywords)
         self.example_solution_prompt = example_prompt_generator(self, example_solution)
+        self.evaluation_prompt = evaluation_method_prompt_generator(self, points)
         final_prompt = final_prompt_generator(self)
         return final_prompt
