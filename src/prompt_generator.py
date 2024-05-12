@@ -55,7 +55,7 @@ def example_prompt_generator(self, example_solution):
     if self.solution_present:
         prompt = f"\nThe professor delivered the following example solution:\n{example_solution}"
     else:
-        prompt = """There is no example solution delivered by the professor. Generate one solution to the 
+        prompt = """There is no example solution delivered by the professor. Generate one solution 
 corresponding to the possible achievable points for the question."""
     return prompt
 
@@ -65,9 +65,9 @@ corresponding to the possible achievable points for the question."""
 # partially right or wrong.
 def evaluation_method_prompt_generator(self, points):
     if type(points) is int or type(points) is float:
-        prompt = f"""Evaluate the answer of the student by giving a score from 0 to {points} and if there 
-are missing or false information please highlight them and explain, why these information are false. Don't outline the
-correct information."""
+        prompt = f"""Evaluate the answer of the student by giving a score from 0 to {points}. You can only do 0,5 points 
+steps. If there are missing or false information please highlight them and explain, why these information are false. 
+Don't outline the correct information."""
     else:
         prompt = """Evaluate the answer of the student if it is right, partially right or wrong and if there 
 are missing or false information please highlight them and explain, why these information are false. Don't outline the
@@ -94,7 +94,8 @@ def final_prompt_generator(self):
         prompt_appendix_steps += f"\n{step_counter}. Compare your solution with the answer of the student"
     step_counter += 1
     prompt_appendix_steps += f"\n{step_counter}. {self.evaluation_prompt}"
-    prompt_appendix_steps += """\nThe Output should always be in a JSON format. But never write json in front of it.
+    prompt_appendix_steps += """\nThe Output should always be in a JSON format and only contain utf-8 chars. Only answer
+in json format, don't stray from the example and don't write anything before or after the json.
 Example:
 {
     "solution":"",
