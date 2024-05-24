@@ -5,6 +5,7 @@ def runner(filename, json_prompt_values, antworten):
     question_prompt = pg.PromptGenerator()
     values = json_prompt_values_converter(json_prompt_values)
     prompt = question_prompt.generate_prompts(values[0], values[1], values[2], values[3])
+
     counter = 0
     for answer in antworten:
         message_text = [
