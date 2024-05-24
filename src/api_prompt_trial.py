@@ -2,7 +2,7 @@ import os
 import openai
 import create_dataset as cd
 
-with open('.key', 'r') as file:
+with open('../server/.key', 'r') as file:
     # Read a line from the file
     key = file.readline().strip()
     base = file.readline().strip()

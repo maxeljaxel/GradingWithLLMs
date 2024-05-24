@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
-    <title>Titel</title>
+    <title>Grading with LLMs</title>
 </head>
 <body>
     <!-- Stylesheets  -->
@@ -14,7 +14,7 @@
     <div class="container">
     <h1 style="margin-top:20px;">Grading with LLMs</h1>
     <!-- The form -->
-    <form onsubmit="sendData(event)">
+    <form onsubmit="sendAll(event)">
         <label for="question">Please write here the question that you want to get checked:</label> <br> <br>
         <textarea class="form-control w-50 mb-4" id="question" name="question" rows="2" style="resize: none">
     </textarea> <br>
@@ -22,31 +22,45 @@
     <label for="sampleSolution">Please write here the perfect answer</label> <br> <br>
     <textarea class="form-control w-50 mb-4" id="sampleSolution" name="sampleSolution" rows="3" style="resize: none">
     </textarea> <br>
-
-    <label for="studentAnswers">upload your student answers</label><br><br>
-    <input class="form-control" type="file" id="studentAnswers"> <br>
-
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="" id="check">
-            <label class="form-check-label" for="check">
-                Do you want to add important keywords?
+         <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="" id="points_check">
+            <label class="form-check-label" for="points_check">
+                Do you want to add points?
             </label>
         </div><br>
-        <input type="text" id="keywords" class="form-control" style="display: none;" placeholder="keyword1;keyword2"><br>
-        <button class="btn btn-primary" type="submit">submit</button>
+        <input type="number" id="points" style="display: none;" step="0.5" min="0,5"><br>
+
+    <label for="studentAnswers">Upload your student answers (separate the answers with ###)</label><br><br>
+    <input class="form-control" type="file" id="studentAnswers"> <br>
+        <label for="keywords">You can enter keywords if necessary here</label>
+        <input type="text" id="keywords" class="form-control" placeholder="keyword1;keyword2"><br>
+        <button class="btn btn-primary" onclick="showToast()" type="submit">submit</button>
     </form>
+        <div id="snackbar">Request sent to server</div>
 
 </div>
     <script>
+
         $(document).ready(function() {
-            $('#check').change(function() {
+            $('#points_check').change(function() {
                 if(this.checked) {
-                    $('#keywords').show();
+                    $('#points').show();
                 } else {
-                    $('#keywords').hide();
+                    $('#points').hide();
                 }
             });
         });
+        function showToast() {
+  // Get the snackbar DIV
+  var x = document.getElementById("snackbar");
+
+  // Add the "show" class to DIV
+  x.className = "show";
+
+  // After 3 seconds, remove the show class from DIV
+  setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+}
+
     </script>
 <script>
     //for hhtprequest
@@ -112,15 +126,47 @@
 
         var question = document.getElementById('question').value;
         var sampleSolution = document.getElementById('sampleSolution').value;
-        var check = document.getElementById('check').checked; // For checkbox, use 'checked' instead of 'value'
         var keywords = document.getElementById('keywords').value;
+        var pointsChecked = document.getElementById('points_check').checked;// For checkbox, use 'checked' instead of 'value'
+        var points = document.getElementById('points').value;
 
         return dataToSend = {
             question: question,
             sampleSolution: sampleSolution,
-            check: check,
-            keywords: keywords
+            keywords: keywords,
+            pointsChecked: pointsChecked,
+            points: points,
         };
+    }
+    function sendAll(event) {
+        if(document.getElementById('question').value == ""){
+            alert("Question field should not be empty")
+            return;
+        }
+        event.preventDefault();
+        const file = document.getElementById("studentAnswers").files[0];
+
+        if(file.type != "text/plain"){
+            alert("Only .txt files are allowed!");
+            return;
+        }
+        const formData = new FormData();
+
+        const jsonBlob = new Blob([JSON.stringify(getFormData())],{type: 'application/json'});
+        formData.append('metadata',jsonBlob);
+
+        formData.append('file', file, file.name);
+
+        fetch("http://localhost:6969/upload", {
+            method: 'POST',
+            body: formData
+        }).then(response => response.json)
+        .then(result => {
+        console.log("Success:", result);
+        })
+        .catch(error => {
+            console.error("Error:", error)
+        });
     }
 
     /*
@@ -151,3 +197,50 @@
 </script>
 </body>
 </html>
+<style>
+     /* The snackbar - position it at the bottom and in the middle of the screen */
+#snackbar {
+  visibility: hidden; /* Hidden by default. Visible on click */
+  min-width: 250px; /* Set a default minimum width */
+  margin-left: -125px; /* Divide value of min-width by 2 */
+  background-color: #333; /* Black background color */
+  color: #fff; /* White text color */
+  text-align: center; /* Centered text */
+  border-radius: 2px; /* Rounded borders */
+  padding: 16px; /* Padding */
+  position: fixed; /* Sit on top of the screen */
+  z-index: 1; /* Add a z-index if needed */
+  left: 50%; /* Center the snackbar */
+  bottom: 30px; /* 30px from the bottom */
+}
+
+/* Show the snackbar when clicking on a button (class added with JavaScript) */
+#snackbar.show {
+  visibility: visible; /* Show the snackbar */
+  /* Add animation: Take 0.5 seconds to fade in and out the snackbar.
+  However, delay the fade out process for 2.5 seconds */
+  -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+  animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+/* Animations to fade the snackbar in and out */
+@-webkit-keyframes fadein {
+  from {bottom: 0; opacity: 0;}
+  to {bottom: 30px; opacity: 1;}
+}
+
+@keyframes fadein {
+  from {bottom: 0; opacity: 0;}
+  to {bottom: 30px; opacity: 1;}
+}
+
+@-webkit-keyframes fadeout {
+  from {bottom: 30px; opacity: 1;}
+  to {bottom: 0; opacity: 0;}
+}
+
+@keyframes fadeout {
+  from {bottom: 30px; opacity: 1;}
+  to {bottom: 0; opacity: 0;}
+}
+</style>

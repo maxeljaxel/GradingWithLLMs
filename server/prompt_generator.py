@@ -1,3 +1,6 @@
+from server import keyword_extraction as ke
+
+
 # This method creates a substring of the prompt for the GPT-4 API. If the blooms taxonomy level is determined, then it
 # uses a specific prompt.
 # **Note: Not all levels have a prompt already implemented yet.**
@@ -130,12 +133,12 @@ class PromptGenerator:
 
     # End-point for the prompt generation. Needs the question tuple, the keyword list and the exampl solution. None of
     # the last two attributes need a value for this method to work perfectly.
-    def generate_prompts(self, question, points, bloom_level, keywords, example_solution):
+    def generate_prompts(self, question, points, keywords, example_solution):
         self.keyword_present = len(keywords) > 0
         self.solution_present = example_solution is not None
         self.question = question
 
-        self.bloom_prompt = bloom_prompt_generator(self, bloom_level)
+        self.bloom_prompt = bloom_prompt_generator(self, ke.isInBloom(question))
         self.keyword_prompt = keyword_prompt_generator(self, keywords)
         self.example_solution_prompt = example_prompt_generator(self, example_solution)
         self.evaluation_prompt = evaluation_method_prompt_generator(self, points)

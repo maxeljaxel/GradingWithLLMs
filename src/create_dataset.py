@@ -1,5 +1,6 @@
 import json
-import keyword_extraction as ke
+from server import keyword_extraction as ke
+
 
 # Input a path to a json file
 # Output the data of given json

@@ -1,6 +1,5 @@
 import create_dataset as cd
-import prompt_generator as pg
-import gpt_access as access_point
+from server import gpt_access as access_point, prompt_generator as pg
 import datetime as dt
 
 content = pg.PromptGenerator()
