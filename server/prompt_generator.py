@@ -1,12 +1,17 @@
 from server import keyword_extraction as ke
 
 
-# This method creates a substring of the prompt for the GPT-4 API. If the blooms taxonomy level is determined, then it
-# uses a specific prompt.
-# **Note: Not all levels have a prompt already implemented yet.**
-# If the level is not determined at first, then GPT-4 is advised to determine it itself and adapt its own behaviour to
-# the level.
-def bloom_prompt_generator(self, bloom_level: object) -> str:
+def _bloom_prompt_generator(bloom_level: object) -> str:
+    """
+    This method creates a substring of the prompt for the GPT-4 API. If the blooms taxonomy level is determined, then it
+    uses a specific prompt.
+    **Note: Not all levels have a prompt already implemented yet.**
+    If the level is not determined at first, then GPT-4 is advised to determine it itself and adapt its own behaviour to
+    the level.
+    :param bloom_level:
+    :return:
+    """
+
     # Knowledge
     if bloom_level == 0:
         prompt = """\nThe bloom level is knowledge. As an assistant you will need to check, if the student can recall 
@@ -33,10 +38,15 @@ an appropriate manner of the bloom level."""
     return prompt
 
 
-# This method creates a substring of the prompt for the GPT-4 API. If keywords are supplied, the prompt will include
-# them and will order the API to these words into account. If no keywords are supplied, then there will be no substring
-# for that involves keywords.
-def keyword_prompt_generator(self, keyword):
+def _keyword_prompt_generator(self, keyword):
+    """
+    This method creates a substring of the prompt for the GPT-4 API. If keywords are supplied, the prompt will include
+    them and will order the API to these words into account. If no keywords are supplied, then there will be no substring
+    for that involves keywords.
+    :param self:
+    :param keyword:
+    :return:
+    """
     prompt = ""
     if self.keyword_present:
         words = ""
@@ -52,9 +62,15 @@ this would benefit the feedback.
     return prompt
 
 
-# This method creates a substring of the prompt for the GPT-4 API. If a solution is delivered the prompt will include it
-# otherwise it orders GPT-4 to generate its own solution.
-def example_prompt_generator(self, example_solution):
+def _example_prompt_generator(self, example_solution):
+    """
+    This method creates a substring of the prompt for the GPT-4 API. If a solution is delivered the prompt will include
+    it otherwise it orders GPT-4 to generate its own solution.
+    :param self:
+    :param example_solution:
+    :return:
+    """
+
     if self.solution_present:
         prompt = f"\nThe professor delivered the following example solution:\n{example_solution}"
     else:
@@ -63,10 +79,15 @@ corresponding to the possible achievable points for the question."""
     return prompt
 
 
-# This method creates a substring of the prompt for the GPT-4 API. If the user supplies a maximum point range, then this
-# will be considered in the prompt, otherwise the prompt will only command to correct if the answer given is right,
-# partially right or wrong.
-def evaluation_method_prompt_generator(self, points):
+def _evaluation_method_prompt_generator(points):
+    """
+    This method creates a substring of the prompt for the GPT-4 API. If the user supplies a maximum point range, then
+    this will be considered in the prompt, otherwise the prompt will only command to correct if the answer given is
+    right,partially right or wrong.
+    :param points:
+    :return:
+    """
+
     if type(points) is int or type(points) is float:
         prompt = f"""Evaluate the answer of the student by giving a score from 0 to {points}. You can only do 0,5 points 
 steps. If there are missing or false information please highlight them and explain, why these information are false. 
@@ -78,9 +99,13 @@ correct information."""
     return prompt
 
 
-# This method generates the final prompt. It uses the specific information of the whole task and generates a prompt
-# based on the information
-def final_prompt_generator(self):
+def _final_prompt_generator(self):
+    """
+    This method generates the final prompt. It uses the specific information of the whole task and generates a prompt
+    based on the information
+    :param self:
+    :return:
+    """
     step_counter = 0
     prompt_appendix_steps = ""
     if self.question[2] == "N":
@@ -117,9 +142,11 @@ engineering and programming. You will receive the question and the student answe
     return prompt + prompt_appendix_steps
 
 
-# Basic prompt generator class. Purpose is to dynamically modify the content for the role system/assistant according to
-# the question and several settings, that are included.
 class PromptGenerator:
+    """
+    Basic prompt generator class. Purpose is to dynamically modify the content for the role system/assistant according
+    to the question and several settings, that are included.
+    """
     keyword_present = False
     solution_present = False
 
@@ -138,9 +165,9 @@ class PromptGenerator:
         self.solution_present = example_solution is not None
         self.question = question
 
-        self.bloom_prompt = bloom_prompt_generator(self, ke.isInBloom(question))
-        self.keyword_prompt = keyword_prompt_generator(self, keywords)
-        self.example_solution_prompt = example_prompt_generator(self, example_solution)
-        self.evaluation_prompt = evaluation_method_prompt_generator(self, points)
-        final_prompt = final_prompt_generator(self)
+        self.bloom_prompt = _bloom_prompt_generator(ke.isInBloom(question))
+        self.keyword_prompt = _keyword_prompt_generator(self, keywords)
+        self.example_solution_prompt = _example_prompt_generator(self, example_solution)
+        self.evaluation_prompt = _evaluation_method_prompt_generator(points)
+        final_prompt = _final_prompt_generator(self)
         return final_prompt

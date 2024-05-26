@@ -4,16 +4,17 @@ from werkzeug.utils import secure_filename
 import flask
 import json
 import threading
-import runner
-
-
+import gpt_querier
 
 app = Flask(__name__)
 CORS(app)
 
+
 @app.route("/")
 def hello():
     return "Hello, World!"
+
+
 @app.route('/users', methods=["GET", "POST"])
 def users():
     print("users endpoint reached")
@@ -26,7 +27,8 @@ def users():
             "message": f"received: {message}"
         }
         return flask.Response(response=json.dumps(return_data), status=201)
-    
+
+
 @app.route('/file', methods=["GET", "POST"])
 def fileUpload():
     print("fileUpload reached")
@@ -40,8 +42,10 @@ def fileUpload():
             print('First line of the file:', first_line)
 
         return jsonify({"status": "file uploaded"}), 200
-    else: 
+    else:
         return jsonify({"status": "GET request received"}), 200
+
+
 @app.route('/upload', methods=["POST"])
 def upload():
     metadata = request.files['metadata'].read().decode('utf-8')
@@ -49,20 +53,27 @@ def upload():
 
     file = request.files['file']
     filename = secure_filename(file.filename).split('.')[0]
-    antworten = lese_antworten_aus_datei(file)
-    thread = threading.Thread(target=runner.runner(filename, json_data, antworten), args=(filename, json_data, antworten))
+    answers = convert_file_content_into_list(file)
+    thread = threading.Thread(target=gpt_querier.query_run,
+                              args=(filename, json_data, answers,))
     thread.start()
     return jsonify({"status": "file uploaded"}), 200
 
 
-def lese_antworten_aus_datei(file):
-    # Dateiinhalt einlesen
+def convert_file_content_into_list(file):
+    """
+    Method to convert the file content into a list. It uses as default the separator symbol '###' and only works with
+    this separator
+    :param file: the file to be converted containing the answers
+    :return: list of answers
+    """
+    # read file content
     inhalt = file.read().decode('utf-8')
 
-    # Antworten durch das Trennzeichen trennen
+    # split answers with the separater symbol
     antworten_roh = inhalt.split('###')
 
-    # Jede Antwort und ihre Stichpunkte in eine Liste speichern
+    # safe every answer in list
     antworten = [antwort.strip() for antwort in antworten_roh if antwort.strip()]
     return antworten
 
