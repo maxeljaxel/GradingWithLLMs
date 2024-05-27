@@ -10,11 +10,6 @@ app = Flask(__name__)
 CORS(app)
 
 
-@app.route("/")
-def hello():
-    return "Hello, World!"
-
-
 @app.route('/users', methods=["GET", "POST"])
 def users():
     print("users endpoint reached")

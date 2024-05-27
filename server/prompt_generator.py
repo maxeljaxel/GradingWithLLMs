@@ -88,7 +88,7 @@ def _evaluation_method_prompt_generator(points):
     :return:
     """
 
-    if type(points) is int or type(points) is float:
+    if type(points) is float:
         prompt = f"""Evaluate the answer of the student by giving a score from 0 to {points}. You can only do 0,5 points 
 steps. If there are missing or false information please highlight them and explain, why these information are false. 
 Don't outline the correct information."""
