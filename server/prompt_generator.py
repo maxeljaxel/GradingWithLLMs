@@ -1,4 +1,4 @@
-from server import keyword_extraction as ke
+import keyword_extraction as ke
 
 
 def _bloom_prompt_generator(bloom_level: object) -> str:

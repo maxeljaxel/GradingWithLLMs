@@ -1,4 +1,4 @@
-from server import gpt_access as access_point, prompt_generator as pg
+import gpt_access as access_point, prompt_generator as pg
 
 
 def query_run(filename, json_prompt_values, antworten):
