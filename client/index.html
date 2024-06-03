@@ -74,6 +74,7 @@
         /*
         This function retrieves the file with the id "studentAnswers" and uploads the file to
         http://localhost:6969/file
+        TODO: Delete
         */
         function sendFile(){
             var file = document.getElementById("studentAnswers").files[0];
@@ -102,7 +103,7 @@
         }
 
         /*
-        This function is to ensure xhr has a value
+        TODO: DELETE
         */
         getXmlHttpRequestObject = function () {
             if (!xhr) {
@@ -112,7 +113,7 @@
             return xhr;
         };
         /*
-        to check the status
+        TODO: DELETE
         */
         function sendDataCallback() {
             // Check response is ready or not
@@ -179,27 +180,6 @@
         /*
         Here the main upload takes place when the user clicks "submit"
         */
-        function sendData(event) {
-            event.preventDefault(); //TODO remove for real tests -> only to not refresh the console
-            //upload the file
-            sendFile();
-            //store the form
-            dataToSend = getFormData();
-            //if no data to upload -> donst POST
-            if (!dataToSend) {
-                console.log("Data is empty.");
-                return;
-            }
-            console.log("Sending data: " + dataToSend);
-            //the http request will be build
-            xhr = getXmlHttpRequestObject();
-            xhr.onreadystatechange = sendDataCallback;
-            // asynchronous requests
-            xhr.open("POST", "http://localhost:6969/users", true);
-            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            // Send the request over the network
-            xhr.send(JSON.stringify({"data": dataToSend}));
-        }
 
     </script>
 </body>

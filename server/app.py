@@ -10,20 +10,7 @@ app = Flask(__name__)
 CORS(app)
 
 
-@app.route('/users', methods=["GET", "POST"])
-def users():
-    print("users endpoint reached")
-    if request.method == "POST":
-        received_data = request.get_json()
-        print(f"received data: {received_data}")
-        message = received_data['data']
-        return_data = {
-            "status": "success",
-            "message": f"received: {message}"
-        }
-        return flask.Response(response=json.dumps(return_data), status=201)
-
-
+#TODO: Delete? 
 @app.route('/file', methods=["GET", "POST"])
 def fileUpload():
     print("fileUpload reached")
