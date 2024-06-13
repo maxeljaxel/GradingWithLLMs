@@ -1,7 +1,7 @@
 import gpt_access as access_point, prompt_generator as pg
 
 
-def query_run(filename, json_prompt_values, antworten):
+def query_run(taskId, fileName, json_prompt_values, antworten, tasks):
     """
     Queries the GPT API with the given answers in the list to retrieve an evaluation for these answers. They will be
     stored in a file, that contains the replies from the GPT API
@@ -28,7 +28,7 @@ def query_run(filename, json_prompt_values, antworten):
         while not result:
             result = access_point.send_message(message_text)
 
-        with open(f"{filename}_result.txt", "a") as file:
+        with open(f"{fileName}_result.txt", "a") as file:
             counter += 1
             file.write(
                 f"Answer nr: {counter}\nQuestion: {values[0]}\nAnswer: {answer}\n")
@@ -36,6 +36,7 @@ def query_run(filename, json_prompt_values, antworten):
             file.write("\n********************\n")
 
     print("Task completed")
+    tasks[taskId] = {"status": "Done", "fileName": f"{fileName}_result.txt"}
 
 
 def json_prompt_values_converter(json_prompt_values):

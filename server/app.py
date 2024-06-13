@@ -1,10 +1,12 @@
-from flask import Flask, jsonify, request
+import flask
+from flask import Flask, jsonify, request, send_file
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
-import flask
 import json
 import threading
 import gpt_querier
+from datetime import datetime
+from multiprocessing import Manager
 
 app = Flask(__name__)
 CORS(app)
@@ -30,6 +32,8 @@ def fileUpload():
 
 @app.route('/upload', methods=["POST"])
 def upload():
+    taskId = datetime.now().strftime('%Y%m%d%H%M%S%f')
+    tasks[taskId] = {"status": "processing"}
     metadata = request.files['metadata'].read().decode('utf-8')
     json_data = json.loads(metadata)
 
@@ -37,11 +41,19 @@ def upload():
     filename = secure_filename(file.filename).split('.')[0]
     answers = convert_file_content_into_list(file)
     thread = threading.Thread(target=gpt_querier.query_run,
-                              args=(filename, json_data, answers,))
+                              args=(taskId, filename, json_data, answers, tasks))
     thread.start()
-    return jsonify({"status": "file uploaded"}), 200
+    return jsonify({"status": "file uploaded", "taskId": taskId}), 200
 
-
+@app.route('/download/<taskId>', methods=["GET"])
+def getFile(taskId):
+    task = tasks[taskId]
+    status = task["status"]
+    if(status=="processing"):
+        return jsonify({"status": "processing"}), 200
+    if(status == "Done"):
+        fileName = task["fileName"]
+        return send_file(fileName), 200
 def convert_file_content_into_list(file):
     """
     Method to convert the file content into a list. It uses as default the separator symbol '###' and only works with
@@ -61,4 +73,6 @@ def convert_file_content_into_list(file):
 
 
 if __name__ == "__main__":
+    manager = Manager()
+    tasks = manager.dict()
     app.run("localhost", 6969)

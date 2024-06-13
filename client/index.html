@@ -139,15 +139,33 @@
             fetch("http://localhost:6969/upload", {
                 method: 'POST',
                 body: formData
-            }).then(response => response.json)
+            }).then(response => response.json())
             .then(result => {
-            console.log("Success:", result);
+            GetFile(result.taskId);
             })
             .catch(error => {
                 console.error("Error:", error)
             });
         }
 
+       function GetFile(taskId) {
+            fetch(`http://localhost:6969/download/${taskId}`, {
+                method: 'GET',
+            }).then((response) => {
+                return response.json().then(data => {
+                    if(data.status === 'processing'){
+                        console.log(data);
+                        console.log(data.status);
+                        setTimeout(() => GetFile(taskId), 2000);
+                    }else{
+                        return response.blob();
+                    }
+                })
+            })
+            .then(blob => {
+                console.log(blob);
+            });
+        }   
         /*
         Here the main upload takes place when the user clicks "submit"
         */
