@@ -58,17 +58,7 @@
         <div id="snackbar">Request sent to server</div>
     </div>
     <script>
-        /*
-        $(document).ready(function() {
-            $('#points_check').change(function() {
-                if(this.checked) {
-                    $('#points_label').show();
-                } else {
-                    $('#points_label').hide();
-                }
-            });
-        });
-         */
+
         function visibilitySwitch( objName, check){
             let divBox = document.getElementById(objName);
             if(check){
@@ -148,24 +138,29 @@
             });
         }
 
-       function GetFile(taskId) {
-            fetch(`http://localhost:6969/download/${taskId}`, {
-                method: 'GET',
-            }).then((response) => {
+        function GetFile(taskId) {
+        fetch(`http://localhost:6969/download/${taskId}`, {
+        method: 'GET',
+        }).then((response) => {
+            const contentType = response.headers.get("content-type");
+            if(contentType && contentType.indexOf("application/json") !== -1) {
                 return response.json().then(data => {
                     if(data.status === 'processing'){
-                        console.log(data);
                         console.log(data.status);
                         setTimeout(() => GetFile(taskId), 2000);
-                    }else{
-                        return response.blob();
                     }
                 })
-            })
-            .then(blob => {
-                console.log(blob);
-            });
-        }   
+            } else {
+                return response.blob();
+            }
+        })
+        .then(data => {
+            if(data instanceof Blob) {
+                console.log(data);
+            }
+        });
+    }
+   
         /*
         Here the main upload takes place when the user clicks "submit"
         */
