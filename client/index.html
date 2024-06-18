@@ -103,7 +103,7 @@
             var pointsChecked = document.getElementById('points_check').checked;// For checkbox, use 'checked' instead of 'value'
             var points = document.getElementById('points').value;
             var wordCountCheck = document.getElementById('word_count_check');
-            var wordLimit = document.getElementById('wordCount')
+            var wordCount = document.getElementById('wordCount')
 
             return dataToSend = {
                 question: question,
@@ -111,8 +111,8 @@
                 keywords: keywords,
                 pointsChecked: pointsChecked,
                 points: points,
-                wordLimitWanted: wordCountCheck,
-                words: wordLimit,
+                wordCountCheck: wordCountCheck,
+                wordCount: wordCount,
             };
         }
         function sendAll(event) {
