@@ -1,5 +1,6 @@
 import json
-import keyword_extraction as kwe
+from server import keyword_extraction as kwe
+
 
 def read_json_file(filename):
     try:
