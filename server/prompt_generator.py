@@ -63,7 +63,7 @@ this would benefit the feedback.
     return prompt
 
 
-def _example_prompt_generator(self, example_solution, wordLimit):
+def _example_prompt_generator(self, example_solution):
     """
     This method creates a substring of the prompt for the GPT-4 API. If a solution is delivered the prompt will include
     it otherwise it orders GPT-4 to generate its own solution.
@@ -72,7 +72,7 @@ def _example_prompt_generator(self, example_solution, wordLimit):
     :return:
     """
 
-    if wordLimit is None:
+    if self.word_limit is None:
         if self.solution_present:
             prompt = f"\nThe professor delivered the following example solution:\n{example_solution}"
         else:
@@ -82,15 +82,15 @@ corresponding to the possible achievable points for the question."""
     else:
         if self.solution_present:
             words = re.findall(r'\b\w+\b', example_solution)
-            if wordLimit <= len(words):
-                self.wordLimiter = False
+            if self.word_limit <= len(words):
+                self.word_limiter = False
                 prompt = f"\nThe professor delivered the following example solution:\n{example_solution}"
             else:
                 prompt = (f"\nThe professor delivered the following example solution:\n{example_solution}. "
-                          f"The answer of the student must be under {wordLimit} words")
+                          f"The answer of the student must be under {self.word_limit} words")
         else:
             prompt = f"""There is no example solution delivered by the professor. Generate one solution with maximum 
-            {wordLimit} words. The solution should correspond to the possible achievable points for the question."""
+{self.word_limit} words. The solution should correspond to the possible achievable points for the question."""
     return prompt
 
 
@@ -139,10 +139,10 @@ def _final_prompt_generator(self):
     if self.keyword_present:
         step_counter += 1
         prompt_appendix_steps += f"\n{step_counter}. Check if the keywords are contextual mentioned in the answer"
-    if self.wordLimiter:
+    if self.word_limiter:
         step_counter += 1
         prompt_appendix_steps += (f"\n{step_counter}. Check the length of the student answer."
-                                  f" It should not exceed the limit of {self.wordLimit} words.")
+                                  f" It should not exceed the limit of {self.word_limit} words.")
     if self.solution_present:
         step_counter += 1
         prompt_appendix_steps += f"\n{step_counter}. Compare the professor solution with the answer of the student"
@@ -165,8 +165,8 @@ Example:
     prompt = f"""You are an AI assistant that helps with the assessment of free text answers in the subject software 
 engineering and programming. You will receive the question and the student answer to this question.\n{self.bloom_prompt}
 \nThe examination question is: \n{self.question}{self.keyword_prompt}{self.example_solution_prompt}
-    \nWith all this information to will now evaluate the incoming student answer.
-    \nDo the following steps:
+\nWith all this information to will now evaluate the incoming student answer.
+\nDo the following steps:
     """
     return prompt + prompt_appendix_steps
 
@@ -178,8 +178,8 @@ class PromptGenerator:
     """
     keyword_present = False
     solution_present = False
-    wordLimiter = True
-    wordLimit = 0
+    word_limiter = True
+    word_limit = 0
     bloom_level = 'N'
 
     def __init__(self):
@@ -197,12 +197,12 @@ class PromptGenerator:
         self.solution_present = len(re.findall(r'\b\w+\b', example_solution)) > 0
         self.question = question
         self.bloom_level = ke.isInBloom(question)
-        self.wordLimiter = word_limit is not None
-        self.wordLimit = word_limit
+        self.word_limiter = word_limit is not None
+        self.word_limit = word_limit
 
         self.bloom_prompt = _bloom_prompt_generator(self)
         self.keyword_prompt = _keyword_prompt_generator(self, keywords)
-        self.example_solution_prompt = _example_prompt_generator(self, example_solution, word_limit)
+        self.example_solution_prompt = _example_prompt_generator(self, example_solution)
         self.evaluation_prompt = _evaluation_method_prompt_generator(points, self, example_solution)
         final_prompt = _final_prompt_generator(self)
         return final_prompt
