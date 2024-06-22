@@ -15,49 +15,62 @@
         <h1>Grading with LLMs</h1>
         <!-- The form -->
         <form onsubmit="sendAll(event)">
+            <!-- Question section -->
             <label for="question">Please write here the question that you want to get checked:</label> <br> <br>
             <textarea class="form-control w-50 mb-4" id="question" name="question" rows="2" style="resize: none"></textarea>
 
+            <!-- Example solution section -->
             <label for="sampleSolution">Please write here the perfect answer:</label><br><br>
             <textarea class="form-control w-50 mb-4" id="sampleSolution" name="sampleSolution" rows="3" style="resize: none">
-
             </textarea>
-             <div class="form-check">
+
+            <!-- Point section -->
+            <div class="form-check">
                 <input class="form-check-input" type="checkbox" onclick="visibilitySwitch('points_label', this.checked)" id="points_check">
                 <label class="form-check-label" for="points_check">
                     Do you want to add points?
                 </label>
             </div><br>
+
             <div class="container" id="points_label" style="display: none; padding-left: 0" >
                 <label for="points">Choose the possible points for the question
                 </label><br><br>
                 <input type="number" id="points" step="0.5" min="0.5" value="0.5"> Points
                 <br><br>
             </div>
+
+            <!-- Word limit section -->
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" onclick="visibilitySwitch('word_count_label', this.checked)" id="word_count_check">
                 <label class="form-check-label" for="word_count_check">
                     Do you want to add a word limit?
                 </label>
             </div><br>
+
             <div class="container" id="word_count_label" style="display: none; padding-left: 0">
                 <label for="wordCount">Choose the maximum word count</label>
                 <input type="number" id="wordCount" step="10" min="30" value="50"> Words
                 <br><br>
             </div>
 
-
-
+            <!-- Upload section -->
             <label for="studentAnswers">Upload your student answers here</label><br>
             <p>(separate the answers with ###)</p>
             <input class="form-control" type="file" id="studentAnswers"> <br>
+
+            <!-- Keyword section -->
             <label for="keywords">You can enter keywords if necessary here:</label><br><br>
             <input type="text" id="keywords" class="form-control" placeholder="keyword1;keyword2"><br>
+
+
             <button class="btn btn-primary" type="submit">submit</button>
         </form>
-        <div id="snackbar">Request sent to server</div>
+        <div id="snackbar"></div>
     </div>
     <script>
+        /*
+        Modifying methods for the html file
+         */
 
         function visibilitySwitch( objName, check){
             let divBox = document.getElementById(objName);
@@ -66,18 +79,28 @@
             } else {
                 divBox.style.display = "none";
             }
-
-
         }
-        function showToast() {
+        function showToast(message, shortDisplay, positive) {
           // Get the snackbar DIV
           let x = document.getElementById("snackbar");
 
           // Add the "show" class to DIV
-          x.className = "show";
+          if(x.className !== "show") {
+             x.className = "show";
+          }
+          x.textContent = message;
 
           // After 3 seconds, remove the show class from DIV
-          setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+          if(shortDisplay){
+             setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+          }
+          if(positive){
+              x.style.backgroundColor = "#4CAF50";
+          }
+          else {
+              x.style.backgroundColor = "#0d6efd";
+          }
+
         }
     </script>
     <script>
@@ -105,6 +128,10 @@
                 wordCount: wordCount,
             };
         }
+
+        /*
+        Here the main upload takes place when the user clicks "submit"
+        */
         function sendAll(event) {
             if(document.getElementById('question').value === ""){
                 alert("Question field should not be empty")
@@ -124,7 +151,7 @@
 
             formData.append('file', file, file.name);
 
-            showToast();
+            showToast("Request sent to server", true, true);
 
             fetch("http://localhost:6969/upload", {
                 method: 'POST',
@@ -135,10 +162,17 @@
             })
             .catch(error => {
                 console.error("Error:", error)
+                showToast("Error occured", true, false );
             });
         }
 
+        /**
+         * recursive method to regain the result file for the post request
+         * @param taskId reference id to identify the corresponding file to request
+         * @constructor
+         */
         function GetFile(taskId) {
+        let filename = ''
         fetch(`http://localhost:6969/download/${taskId}`, {
         method: 'GET',
         }).then((response) => {
@@ -147,10 +181,20 @@
                 return response.json().then(data => {
                     if(data.status === 'processing'){
                         console.log(data.status);
-                        setTimeout(() => GetFile(taskId), 2000);
+                        showToast(data.progress + " completed", false,false);
+                        setTimeout(() => GetFile(taskId), 8000);
                     }
                 })
             } else {
+                showToast("Processing is done", true,true);
+                const disposition = response.headers.get('Content-Disposition');
+                if (disposition && disposition.includes('attachment')) {
+                    const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                    const matches = filenameRegex.exec(disposition);
+                    if (matches != null && matches[1]) {
+                        filename = matches[1].replace(/['"]/g, '');
+                    }
+                }
                 return response.blob();
             }
         })
@@ -160,7 +204,7 @@
                 const url = window.URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = 'filename.txt'; 
+                link.download = filename;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
@@ -168,9 +212,6 @@
         });
     }
    
-        /*
-        Here the main upload takes place when the user clicks "submit"
-        */
 
     </script>
 </body>
@@ -193,7 +234,7 @@
       visibility: hidden; /* Hidden by default. Visible on click */
       min-width: 250px; /* Set a default minimum width */
       margin-left: -125px; /* Divide value of min-width by 2 */
-      background-color: #4CAF50; /* Black background color */
+      background-color: #4CAF50; /* Green background color */
       color: #fff; /* White text color */
       text-align: center; /* Centered text */
       border-radius: 2px; /* Rounded borders */

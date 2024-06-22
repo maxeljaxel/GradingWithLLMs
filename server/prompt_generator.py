@@ -9,8 +9,8 @@ def _bloom_prompt_generator(self):
     **Note: Not all levels have a prompt already implemented yet.**
     If the level is not determined at first, then GPT-4 is advised to determine it itself and adapt its own behaviour to
     the level.
-    :param bloom_level:
-    :return:
+    :param bloom_level: level in the bloom taxonomy
+    :return: a bloom taxonomy related prompt section
     """
 
     # Knowledge
@@ -44,9 +44,9 @@ def _keyword_prompt_generator(self, keyword):
     This method creates a substring of the prompt for the GPT-4 API. If keywords are supplied, the prompt will include
     them and will order the API to these words into account. If no keywords are supplied, then there will be no substring
     for that involves keywords.
-    :param self:
-    :param keyword:
-    :return:
+    :param self: the class itself with its values
+    :param keyword: the keywords wanted to be considered in the evaluation
+    :return: a keyword related prompt section
     """
     prompt = ""
     if self.keyword_present:
@@ -67,9 +67,9 @@ def _example_prompt_generator(self, example_solution):
     """
     This method creates a substring of the prompt for the GPT-4 API. If a solution is delivered the prompt will include
     it otherwise it orders GPT-4 to generate its own solution.
-    :param self:
-    :param example_solution:
-    :return:
+    :param self: the class itself with its values
+    :param example_solution: the solution provided by the user if present
+    :return: a solution related prompt section
     """
 
     if self.word_limit is None:
@@ -99,8 +99,8 @@ def _evaluation_method_prompt_generator(points, self, example_solution):
     This method creates a substring of the prompt for the GPT-4 API. If the user supplies a maximum point range, then
     this will be considered in the prompt, otherwise the prompt will only command to correct if the answer given is
     right,partially right or wrong.
-    :param points:
-    :return:
+    :param points: the points the user wants to have for the evaluation to have
+    :return: an evaluation related prompt section considering the points
     """
 
     if type(points) is float:
@@ -126,10 +126,10 @@ correct information."""
 
 def _final_prompt_generator(self):
     """
-    This method generates the final prompt. It uses the specific information of the whole task and generates a prompt
+    This method generates the final prompt. It uses the specific information of the whole class and generates a prompt
     based on the information
-    :param self:
-    :return:
+    :param self: instance of the class itself
+    :return: the final prompt build together
     """
     step_counter = 0
     prompt_appendix_steps = ""
@@ -193,6 +193,16 @@ class PromptGenerator:
     # End-point for the prompt generation. Needs the question tuple, the keyword list and the exampl solution. None of
     # the last two attributes need a value for this method to work perfectly.
     def generate_prompts(self, question, points, keywords, example_solution, word_limit):
+        """
+        End-point for the prompt generation. Needs the question, points, keyword list, example solution and word limit.
+        Only thing needed is the question itself, the rest is optional.
+        :param question: Question to be evaluated
+        :param points: Points to be associated with the question
+        :param keywords: Keywords wanted to occur in the answer of the student
+        :param example_solution: Example solution that should be used to evaluate the student answer
+        :param word_limit: The maximum limit of words the student should use
+        :return: A prompt that is considering all inputs the user is using
+        """
         self.keyword_present = len(keywords) > 0
         self.solution_present = len(re.findall(r'\b\w+\b', example_solution)) > 0
         self.question = question
