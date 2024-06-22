@@ -23,7 +23,7 @@ def send_message(message):
 
         temperature=0.25,
 
-        max_tokens=800,
+        max_tokens=1000,
 
         top_p=0.95,
 

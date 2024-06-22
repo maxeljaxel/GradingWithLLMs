@@ -12,7 +12,7 @@ def query_run(taskId, fileName, json_prompt_values, antworten, tasks):
     """
     question_prompt = pg.PromptGenerator()
     values = json_prompt_values_converter(json_prompt_values)
-    prompt = question_prompt.generate_prompts(values[0], values[1], values[2], values[3])
+    prompt = question_prompt.generate_prompts(values[0], values[1], values[2], values[3], values[4])
 
     counter = 0
     for answer in antworten:
@@ -35,6 +35,8 @@ def query_run(taskId, fileName, json_prompt_values, antworten, tasks):
             file.write(result)
             file.write("\n********************\n")
 
+
+
     print("Task completed")
     tasks[taskId] = {"status": "Done", "fileName": f"{fileName}_result.txt"}
 
@@ -53,4 +55,8 @@ def json_prompt_values_converter(json_prompt_values):
         values.append(None)
     values.append(json_prompt_values['keywords'])
     values.append(json_prompt_values['sampleSolution'])
+    if json_prompt_values['wordCountCheck']:
+        values.append(int(json_prompt_values['wordCount']))
+    else:
+        values.append(None)
     return values
