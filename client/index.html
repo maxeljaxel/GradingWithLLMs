@@ -131,9 +131,10 @@
             }
         }
 
-        /*
-        Here the main upload takes place when the user clicks "submit"
-        */
+        /**
+         * Send the data to the server
+         * @param event triggers the event
+         */
         function sendAll(event) {
             if(document.getElementById('question').value === ""){
                 alert("Question field should not be empty")
