@@ -1,7 +1,7 @@
 csv
 pandas
 openai==0.28.1
-flask
+flask~=3.0.3
 flask_cors
 json
-
+Werkzeug~=3.0.2

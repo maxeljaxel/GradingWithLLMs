@@ -3,9 +3,8 @@ import os
 import threading
 from datetime import datetime
 from multiprocessing import Manager
-from wsgiref.types import InputStream
 
-from flask import Flask, jsonify, request, send_file, Response
+from flask import Flask, jsonify, request, Response
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 
@@ -31,9 +30,9 @@ def upload():
     return jsonify({"status": "file uploaded", "taskId": task_id}), 200
 
 
-@app.route('/download/<taskId>', methods=["GET"])
-def getFile(taskId):
-    task = tasks[taskId]
+@app.route('/download/<task_id>', methods=["GET"])
+def get_file(task_id):
+    task = tasks[task_id]
     status = task["status"]
     if status == "processing":
         progress = task["progress"]
@@ -41,18 +40,18 @@ def getFile(taskId):
     if status == "Done":
         file_name = task["fileName"]
         try:
-            with open(file_name, 'r') as datei:
+            with open(file_name, 'r') as file:
                 # safe content into a temporary file
-                datei_inhalt = datei.read()
+                file_content = file.read()
             # delete the file from the server
             os.remove(file_name)
-            response = Response(datei_inhalt, mimetype='application/octet-stream')
+            response = Response(file_content, mimetype='application/octet-stream')
             response.headers.set('Content-Disposition', 'attachment', filename=os.path.basename(file_name))
 
             # create a Response object and return it with Response 200
             return response, 200
         except FileNotFoundError:
-            return "Datei nicht gefunden", 404
+            return "File not Found", 404
 
 
 def convert_file_content_into_list(file):
