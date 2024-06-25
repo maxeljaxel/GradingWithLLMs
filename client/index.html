@@ -94,7 +94,7 @@
               setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
           }else if (messageType === "success"){
               x.style.backgroundColor = "#4CAF50";
-              setTimeout(function(){ x.className = x.className.replace("show", ""); }, 2500);
+              setTimeout(function(){ x.className = x.className.replace("show", ""); }, 2000);
           }else if(messageType === "download") {
               x.style.backgroundColor = "#2196F3";
               setTimeout(function () {
@@ -178,6 +178,9 @@
         fetch(`http://localhost:6969/download/${taskId}`, {
         method: 'GET',
         }).then((response) => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
             const contentType = response.headers.get("content-type");
             if(contentType && contentType.indexOf("application/json") !== -1) {
                 return response.json().then(data => {
@@ -215,6 +218,9 @@
                     document.body.removeChild(link);
                     },2200)
             }
+        }).catch(error => {
+            console.error("Error:", error)
+            showToast("Error occurred", "error" );
         });
     }
    
@@ -256,9 +262,10 @@
       visibility: visible; /* Show the snackbar */
       /* Add animation: Take 0.5 seconds to fade in and out the snackbar.
       However, delay the fade out process for 2.5 seconds */
-      -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
-      animation: fadein 0.5s, fadeout 0.5s 2.5s;
+      -webkit-animation: fadein 0.5s;
+      animation: fadein 0.5s;
     }
+
 
     /* Animations to fade the snackbar in and out */
     @-webkit-keyframes fadein {

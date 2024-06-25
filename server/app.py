@@ -40,11 +40,11 @@ def get_file(task_id):
     if status == "Done":
         file_name = task["fileName"]
         try:
-            with open(file_name, 'r') as file:
+            with open(f"{task_id}.txt", 'r') as file:
                 # safe content into a temporary file
                 file_content = file.read()
             # delete the file from the server
-            os.remove(file_name)
+            os.remove(f"{task_id}.txt")
             response = Response(file_content, mimetype='application/octet-stream')
             response.headers.set('Content-Disposition', 'attachment', filename=os.path.basename(file_name))
 
@@ -52,6 +52,11 @@ def get_file(task_id):
             return response, 200
         except FileNotFoundError:
             return "File not Found", 404
+    if status == "Error":
+        progress = task["progress"]
+        if os.path.exists(f"{task_id}.txt"):
+            os.remove(f"{task_id}.txt")
+        return jsonify({"status": "Error", "progress": f"{progress}"}), 500
 
 
 def convert_file_content_into_list(file):
