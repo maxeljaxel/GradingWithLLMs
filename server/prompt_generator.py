@@ -114,7 +114,7 @@ steps. If there are missing or false information please highlight them and expla
 Don't outline the correct information."""
     else:
         if self.solution_present:
-            prompt = """Evaluate the answer of the student if it is right, partially right or wrong and if there 
+            prompt = f"""Evaluate the answer of the student if it is right, partially right or wrong and if there 
 are missing or false information please highlight them and explain, why these information are false. Use only the example solution {example_solution} to evaluate the answer. Don't outline the
 correct information."""
         else:
