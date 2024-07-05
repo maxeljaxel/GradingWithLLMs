@@ -9,6 +9,7 @@ from flask_cors import CORS
 from werkzeug.utils import secure_filename
 
 import gpt_querier
+from server import test_server_frontend
 
 app = Flask(__name__)
 CORS(app, expose_headers=['Content-Disposition'])
