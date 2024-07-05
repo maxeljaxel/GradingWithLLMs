@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
-    <title>Grading with LLMs</title>
+    <title>KARL</title>
 </head>
 <body>
     <!-- Stylesheets  -->
@@ -12,63 +12,75 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
 
     <div class="container" id="form_object">
-        <h1>Grading with LLMs</h1>
+        <h1>
+            K
+            <span style="font-size: 1rem;">nowledge</span>
+            A
+            <span style="font-size: 1rem;">ssessment for</span>
+            R
+            <span style="font-size: 1rem;">eliable</span>
+            L
+            <span style="font-size: 1rem;">earning</span></h1>
+        <hr>
         <!-- The form -->
         <form onsubmit="sendAll(event)">
+            <!-- Question section -->
             <label for="question">Please write here the question that you want to get checked:</label> <br> <br>
             <textarea class="form-control w-50 mb-4" id="question" name="question" rows="2" style="resize: none"></textarea>
 
+            <!-- Example solution section -->
             <label for="sampleSolution">Please write here the perfect answer:</label><br><br>
             <textarea class="form-control w-50 mb-4" id="sampleSolution" name="sampleSolution" rows="3" style="resize: none">
-
             </textarea>
-             <div class="form-check">
+
+            <!-- Point section -->
+            <div class="form-check">
                 <input class="form-check-input" type="checkbox" onclick="visibilitySwitch('points_label', this.checked)" id="points_check">
                 <label class="form-check-label" for="points_check">
                     Do you want to add points?
                 </label>
             </div><br>
+
             <div class="container" id="points_label" style="display: none; padding-left: 0" >
                 <label for="points">Choose the possible points for the question
                 </label><br><br>
                 <input type="number" id="points" step="0.5" min="0.5" value="0.5"> Points
                 <br><br>
             </div>
+
+            <!-- Word limit section -->
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" onclick="visibilitySwitch('word_count_label', this.checked)" id="word_count_check">
                 <label class="form-check-label" for="word_count_check">
                     Do you want to add a word limit?
                 </label>
             </div><br>
+
             <div class="container" id="word_count_label" style="display: none; padding-left: 0">
                 <label for="wordCount">Choose the maximum word count</label>
                 <input type="number" id="wordCount" step="10" min="30" value="50"> Words
                 <br><br>
             </div>
 
-
-
+            <!-- Upload section -->
             <label for="studentAnswers">Upload your student answers here</label><br>
             <p>(separate the answers with ###)</p>
             <input class="form-control" type="file" id="studentAnswers"> <br>
+
+            <!-- Keyword section -->
             <label for="keywords">You can enter keywords if necessary here:</label><br><br>
             <input type="text" id="keywords" class="form-control" placeholder="keyword1;keyword2"><br>
+
+
             <button class="btn btn-primary" type="submit">submit</button>
         </form>
-        <div id="snackbar">Request sent to server</div>
+        <div id="snackbar"></div>
     </div>
     <script>
         /*
-        $(document).ready(function() {
-            $('#points_check').change(function() {
-                if(this.checked) {
-                    $('#points_label').show();
-                } else {
-                    $('#points_label').hide();
-                }
-            });
-        });
+        Modifying methods for the html file
          */
+
         function visibilitySwitch( objName, check){
             let divBox = document.getElementById(objName);
             if(check){
@@ -76,18 +88,30 @@
             } else {
                 divBox.style.display = "none";
             }
-
-
         }
-        function showToast() {
+        function showToast(message, messageType) {
           // Get the snackbar DIV
           let x = document.getElementById("snackbar");
 
-          // Add the "show" class to DIV
-          x.className = "show";
+          if(x.className !== "show") {
+             x.className = "show";
+          }
+          x.textContent = message;
 
-          // After 3 seconds, remove the show class from DIV
-          setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+          if(messageType === "error"){
+              x.style.backgroundColor = "#f44336";
+              setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+          }else if (messageType === "success"){
+              x.style.backgroundColor = "#4CAF50";
+              setTimeout(function(){ x.className = x.className.replace("show", ""); }, 2000);
+          }else if(messageType === "download") {
+              x.style.backgroundColor = "#2196F3";
+              setTimeout(function () {
+                  x.className = x.className.replace("show", "");
+              }, 3000);
+          }else {
+              x.style.backgroundColor = "#0d6efd";
+          }
         }
     </script>
     <script>
@@ -97,15 +121,15 @@
         */
         function getFormData() {
 
-            var question = document.getElementById('question').value;
-            var sampleSolution = document.getElementById('sampleSolution').value;
-            var keywords = document.getElementById('keywords').value;
-            var pointsChecked = document.getElementById('points_check').checked;// For checkbox, use 'checked' instead of 'value'
-            var points = document.getElementById('points').value;
-            var wordCountCheck = document.getElementById('word_count_check').checked;
-            var wordCount = document.getElementById('wordCount').value;
+            let question = document.getElementById('question').value;
+            let sampleSolution = document.getElementById('sampleSolution').value;
+            let keywords = document.getElementById('keywords').value;
+            let pointsChecked = document.getElementById('points_check').checked;// For checkbox, use 'checked' instead of 'value'
+            let points = document.getElementById('points').value;
+            let wordCountCheck = document.getElementById('word_count_check').checked;// For checkbox, use 'checked' instead of 'value'
+            let wordCount = document.getElementById('wordCount').value;
 
-            return dataToSend = {
+            return {
                 question: question,
                 sampleSolution: sampleSolution,
                 keywords: keywords,
@@ -113,8 +137,13 @@
                 points: points,
                 wordCountCheck: wordCountCheck,
                 wordCount: wordCount,
-            };
+            }
         }
+
+        /**
+         * Send the data to the server
+         * @param event triggers the event
+         */
         function sendAll(event) {
             if(document.getElementById('question').value === ""){
                 alert("Question field should not be empty")
@@ -134,23 +163,76 @@
 
             formData.append('file', file, file.name);
 
-            showToast();
+            showToast("Request sent to server", "success");
 
             fetch("http://localhost:6969/upload", {
                 method: 'POST',
                 body: formData
-            }).then(response => response.json)
+            }).then(response => response.json())
             .then(result => {
-            console.log("Success:", result);
+            setTimeout(() => GetFile(result.taskId), 3000);
             })
             .catch(error => {
                 console.error("Error:", error)
+                showToast("Error occurred", "error" );
             });
         }
 
-        /*
-        Here the main upload takes place when the user clicks "submit"
-        */
+        /**
+         * recursive method to regain the result file for the post request
+         * @param taskId reference id to identify the corresponding file to request
+         */
+        function GetFile(taskId) {
+        let filename = ''
+        fetch(`http://localhost:6969/download/${taskId}`, {
+        method: 'GET',
+        }).then((response) => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const contentType = response.headers.get("content-type");
+            if(contentType && contentType.indexOf("application/json") !== -1) {
+                return response.json().then(data => {
+                    if(data.status === 'processing'){
+                        console.log(data.status);
+                        showToast(data.progress + " completed", "info");
+                        setTimeout(() => GetFile(taskId), 8000);
+                    }
+                })
+            } else {
+                showToast("Processing is done", "success");
+                const disposition = response.headers.get('Content-Disposition');
+                if (disposition && disposition.includes('attachment')) {
+                    const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                    const matches = filenameRegex.exec(disposition);
+                    if (matches != null && matches[1]) {
+                        filename = matches[1].replace(/['"]/g, '');
+                    }
+                }
+                setTimeout(()=>showToast("Download started", "download"), 2000);
+                return response.blob();
+            }
+        })
+        .then(data => {
+
+            if(data instanceof Blob) {
+                setTimeout(()=>{
+                    const blob = new Blob([data], { type: 'application/octet-stream' });
+                    const url = window.URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    },2200)
+            }
+        }).catch(error => {
+            console.error("Error:", error)
+            showToast("Error occurred", "error" );
+        });
+    }
+   
 
     </script>
 </body>
@@ -173,7 +255,7 @@
       visibility: hidden; /* Hidden by default. Visible on click */
       min-width: 250px; /* Set a default minimum width */
       margin-left: -125px; /* Divide value of min-width by 2 */
-      background-color: #4CAF50; /* Black background color */
+      background-color: #4CAF50; /* Green background color */
       color: #fff; /* White text color */
       text-align: center; /* Centered text */
       border-radius: 2px; /* Rounded borders */
@@ -189,9 +271,10 @@
       visibility: visible; /* Show the snackbar */
       /* Add animation: Take 0.5 seconds to fade in and out the snackbar.
       However, delay the fade out process for 2.5 seconds */
-      -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
-      animation: fadein 0.5s, fadeout 0.5s 2.5s;
+      -webkit-animation: fadein 0.5s;
+      animation: fadein 0.5s;
     }
+
 
     /* Animations to fade the snackbar in and out */
     @-webkit-keyframes fadein {

@@ -15,6 +15,11 @@ deployment_name = name
 
 
 def send_message(message):
+    """
+    This method handels the connection with the API of GPT and uses fixed values. Only modifiable value is the message to be sent.
+    :param message: Message to be sent.
+    :return: The response from the API.
+    """
     answer = openai.ChatCompletion.create(
 
         engine="GPT4StudentAssessment",
@@ -37,6 +42,13 @@ def send_message(message):
 
 
 def send_message_and_temp(message, temp):
+    """
+    This method handels the connection between the GPT API and uses fixed values. Only modifiable values are the
+    temperature and the message to be sent.
+    :param message: Message to be sent.
+    :param temp: value of the temperature. It regulates the answer creativity.
+    :return:
+    """
     response = openai.Completion.create(
         engine="GPT4StudentAssessment",
 
@@ -57,8 +69,12 @@ def send_message_and_temp(message, temp):
     return response['choices'][0]['message']['content']
 
 
-# Converts the response into a JSON-object, if it is not possible to convert it prints the output out with a warning
 def convert_response_into_json(response):
+    """
+    This method converts the response received from the API into a json format.
+    :param response: response received from the API.
+    :return: a json formatted Object
+    """
     json_object = None
     try:
         if response.startswith("```"):
