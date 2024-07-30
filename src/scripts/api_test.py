@@ -2,7 +2,7 @@ import os
 import openai
 import create_dataset as cd
 
-with open('../server/.key', 'r') as file:
+with open('../../server/.key', 'r') as file:
     # Read a line from the file
     key = file.readline().strip()
     base = file.readline().strip()
@@ -49,7 +49,7 @@ print(assistant_message)
     #text = response['choices'][0]['text'].replace('\n', '').replace(' .', '.').strip()
     #print(start_phrase+text)
 
-data_set = cd.create_tuple_dict(cd.read_json_file("intents.json"))
+data_set = cd.create_tuple_dict(cd.read_json_file("Datasets/intents.json"))
 for questions in data_set:
     message_text = [{"role":"system","content":f"Question: {data_set[questions][0]} Answer: {data_set[questions][1]} Blooms Kategory: {data_set[questions][2]}"}]
     completion = openai.ChatCompletion.create(

@@ -1,10 +1,10 @@
-import create_dataset as cd
+from src.scripts import create_dataset as cd
 from server import gpt_access as access_point, prompt_generator as pg
 import datetime as dt
 
 content = pg.PromptGenerator()
 
-data_set = cd.create_tuple_dict(cd.read_json_file("wrong_answer.json"))
+data_set = cd.create_tuple_dict(cd.read_json_file("../Datasets/wrong_answer.json"))
 gpt_output = {}
 
 for question in data_set:
